@@ -7,12 +7,12 @@ from infer_U_Net import inference_NN
 import warnings
 warnings.filterwarnings("ignore", category=Warning)
 
-saveNN = True
+saveNN = False
 saveVideo = True
-saveTraco = True
 showVisual = True
+saveTraco = False
 
-def run(path):
+def run(path, name):
     """Main function for the program
 
     :param path: the path of the video that we want to analysis
@@ -40,7 +40,12 @@ def run(path):
 if __name__ == "__main__":
     # name = "8"
     # path = "Training videos\\training0{}.mp4".format(name)
-    for i in range(1,6):
+    for i in range(1,99):
         name = str(i)
-        path = "testVideo\\test000{}.mp4".format(name)
-        run(path)
+        path = "Training videos\\training0{}.mp4".format(name)
+        # path = "testVideo\\test000{}.mp4".format(name)
+        run(path, name)
+
+
+    # path = "testVideo\\test000{}.mp4".format(1)
+    # run(path, str(5))

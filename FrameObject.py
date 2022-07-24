@@ -7,6 +7,7 @@ class Frame:
     """
     def __init__(self, data, img):
         """init function save data in frame Object
+        it will remove the component that is too small
 
         :param data: result from U-Net
         :type data: numpy array shape [2,width, height]
@@ -16,12 +17,15 @@ class Frame:
         self.image = img
         self.headMask = data[1]
         num, labels, bboxes, centers = data[0]
+        minArea = 0.10 * np.max(bboxes[1:,4])
         self.hexbugs = []
 
         for i in range(1,num):
             label = labels==i
             bbox = bboxes[i]
             center = centers[i]
+            if bbox[4] <= minArea:
+                continue
             self.hexbugs.append(HexObject(label, bbox, center, self.computeMainColor(label)))
 
     def computeMainColor(self, label):

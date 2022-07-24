@@ -77,6 +77,8 @@ def numpy2tensor(img, compose):
     img = cv2.resize(img, (224,224))
     img = img / 255
     tensor = compose(img).type(t.FloatTensor)
+    if t.cuda.is_available():
+        return t.unsqueeze(tensor,0).cuda()
     return t.unsqueeze(tensor,0)
 
 
@@ -94,10 +96,11 @@ def inference_NN(videos):
     net = Unet(n_channels=3, n_classes=2, recurrent=False, residual=True)
     ckp = t.load('ckp/checkpoint_{}.ckp'.format("Residual"), None)#'cuda')
     net.load_state_dict(ckp['state_dict'])
-
+    if t.cuda.is_available():
+        net = net.cuda()
     results = []
     for frame in tqdm(videos):
-        frame_tensor = numpy2tensor(frame,compose)#.cuda()
+        frame_tensor = numpy2tensor(frame,compose)
         res = net(frame_tensor).cpu().data.numpy()[0]
         res = unpadding(frame, res)
         results.append(res)

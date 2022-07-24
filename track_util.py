@@ -6,6 +6,13 @@ import cv2
 import numpy as np
 from FrameObject import Frame
 
+def visual(frame):
+    import matplotlib.pyplot as plt
+    plt.figure()
+    plt.imshow(frame[0])
+    plt.figure()
+    plt.imshow(frame[1])
+    plt.show()
 
 def normalize(frame, thres):
     """normalize the image
@@ -26,7 +33,7 @@ def normalize(frame, thres):
     frame = frame.astype(np.uint8)
     return frame
 
-def erodeUtilFit(img, num:int, maxIter=5, sizeScale=2):
+def erodeUtilFit(img, num:int, maxIter=10, sizeScale=10):
     """do erode for the mask, make the component close the the number of bugs
 
     :param img: mask image
@@ -45,10 +52,10 @@ def erodeUtilFit(img, num:int, maxIter=5, sizeScale=2):
         erosion = cv2.erode(img,kernel,iterations = 1)
         output = cv2.connectedComponentsWithStats(erosion, 8, cv2.CV_32S)
         if output[0]-1 <= num:
-            return output
-    return output
+            return output, erosion
+    return output, erosion
 
-def connectComponentForVideos(videos, thres: float = 0.75):
+def connectComponentForVideos(videos, thres: float = 0.70):
     """ compute connect component for video
 
     :param videos: load video
@@ -63,16 +70,16 @@ def connectComponentForVideos(videos, thres: float = 0.75):
     for frame in videos:
         frame = normalize(frame,thres)
         frames.append(frame[0])
-
+        # visual(frame)
         output0 = cv2.connectedComponentsWithStats(frame[0], 8, cv2.CV_32S)
 
         num.append(output0[0])
         res.append([output0,frame[1]])
     counts = np.bincount(np.array(num))
     numBug = np.argmax(counts)-1
-
+    print(numBug)
     for i in range(len(videos)):
-        res[i][0] = erodeUtilFit(frames[i], numBug, maxIter=5, sizeScale=2)
+        res[i][0], frames[i] = erodeUtilFit(frames[i], numBug, maxIter=5, sizeScale=2)
     return np.array(res)
 
 def getVideoFromPath(path):

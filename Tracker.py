@@ -85,6 +85,7 @@ class Tracker:
                 # set new id
                 if bug.id == -1:
                     self.pushNew(bug,self.currentID)
+        print(self.currentID)
 
     def initFirstFrame(self):
         """init segment in first frame
@@ -106,8 +107,8 @@ class Tracker:
         bug.id = id
         if id not in self.segments.keys():
             self.segments[id] = Segment(id)
+            self.currentID += 1
         self.segments[id].push(bug)
-        self.currentID += 1
 
     def computeIOU(self, a,b):
         """compute the Intersection over Union base on mask
